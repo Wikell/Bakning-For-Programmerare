@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="sv" xml:lang="sv">
+<head>
+<title>Chokladbollar</title>
+<meta charset="UTF-8">
+<script src="prism.js" type="text/javascript"></script>
+<link rel="stylesheet" href="prism.css" />
+</head>
+<body>
+<pre><code class="language-csharp">
+
+using System;
+using System.Threading;
+using System.Linq;
+
+public enum Dekoration
+{
+	Pärlsocker,
+	Kokos,
+	Kakao,
+	Lingonpulver
+}
+
+//https://www.arla.se/recept/chokladbollar/
+public class Chokladbollar 
+{
+	#region ingredienser
+
+	g smör = 150;
+	dl strösocker = 1.5;
+	msk kakao = 3;
+	tsk vaniljsocker = 1;
+	msk kaffe = 2;
+	dl havregryn = 4;
+	dl pärlsocker = 1;
+
+	#endregion
+
+	var redskap = new List< Redskap>();
+	
+	static void Main() 
+	{
+		Setup();
+		var recept = new Chokladbollar();
+		recept.Run();
+	}
+	
+	private static void Setup()
+	{
+		redskap.Add(new Bunke());
+		redskap.Add(new Slev());
+		redskap.Add(new Tallrik());
+		
+		while(!IsRoomTemperature(smör)) 
+		{
+			Thread.Sleep(60000);
+		}
+		
+		Brygg(kaffe);
+		
+		while(!IsCool(kaffe)) 
+		{
+			Thread.Sleep(60000);
+		}
+	}
+	
+	private void Run()
+	{
+		var bunke = redskap.First(p => typeof(p) == Bunke);
+		
+		bunke.Add(smör);
+		bunke.Add(strösocker);
+		
+		var slev = redskap.First(p => p.typeof(p) == Slev);
+		bunke.Add(slev);
+		
+		bunke.Blanda();
+		
+		bunke.Add(kakao);
+		bunke.Add(vaniljsocker);
+		bunke.Add(kaffe);
+		bunke.Add(havregryn);
+		
+		bunke.Blanda();
+		bunke.Remove(slev);
+		
+		var tallrik = redskap.First(p => p.typeof(p) == Tallrik);
+		tallrik.add(pärlsocker);
+		
+		while(bunke.Count > 0) 
+		{
+			var klump = bunke.Take(1);
+			while(!klump.IsRound()) 
+			{
+				klump.Rulla();
+			}
+			
+			//Omdefinition för förtydligande
+			var boll = (Sphere) klump;
+			
+			tallrik.add(boll);
+			
+			while(!boll.IsCovered(Dekoration.Pärlsocker))
+			{
+				boll.Rulla();
+			}
+		}
+		
+	}
+	
+	private bool IsCovered(this Sphere s, Dekoration deco)
+	{
+		decimal acceptedCoverage;
+		if(deco == Dekoration.Pärlsocker) 
+		{
+			acceptedCoverage = 70.0;
+		}
+		else if(deco == Dekoration.Kokos)
+		{
+			acceptedCoverage = 85.0;
+		}
+		else
+		{
+			acceptedCoverage = 100.0;
+		}
+		
+		if(s.CoveredArea / s.SurfaceArea >= acceptedCoverage)
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private bool IsRoomTemperature(object o) 
+	{
+		if(o.temperature < 15 || o.temperature > 25) 
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private bool IsCool(object o) 
+	{
+		if(o.temperature > 25)
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+}
+
+</code></pre>
+
+
+</body>
+</html>
