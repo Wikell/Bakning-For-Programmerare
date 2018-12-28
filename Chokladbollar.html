@@ -12,6 +12,7 @@
 using System;
 using System.Threading;
 using System.Linq;
+using System.Baking;
 
 public enum Dekoration
 {
@@ -32,7 +33,7 @@ public class Chokladbollar
 	tsk vaniljsocker = 1;
 	msk kaffe = 2;
 	dl havregryn = 4;
-	dl pärlsocker = 1;
+	dl kokos = 1;
 
 	#endregion
 
@@ -50,6 +51,7 @@ public class Chokladbollar
 		redskap.Add(new Bunke());
 		redskap.Add(new Slev());
 		redskap.Add(new Tallrik());
+		redskap.Add(new Serveringsfat());
 		
 		while(!IsRoomTemperature(smör)) 
 		{
@@ -85,7 +87,9 @@ public class Chokladbollar
 		bunke.Remove(slev);
 		
 		var tallrik = redskap.First(p => p.typeof(p) == Tallrik);
-		tallrik.add(pärlsocker);
+		tallrik.Add(kokos);
+		
+		var serveringsfat = redskap.First(p => p.typeof(p) == Serveringsfat);
 		
 		while(bunke.Count > 0) 
 		{
@@ -98,12 +102,15 @@ public class Chokladbollar
 			//Omdefinition för förtydligande
 			var boll = (Sphere) klump;
 			
-			tallrik.add(boll);
+			tallrik.Add(boll);
 			
-			while(!boll.IsCovered(Dekoration.Pärlsocker))
+			while(!boll.IsCovered(Dekoration.Kokos))
 			{
 				boll.Rulla();
 			}
+			
+			tallrik.Remove(boll);
+			serveringsfat.Add(boll);
 		}
 		
 	}
