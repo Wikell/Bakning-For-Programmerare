@@ -1,0 +1,156 @@
+<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="sv" xml:lang="sv">
+<head>
+<title>Kladdkaka</title>
+<meta charset="UTF-8">
+<script src="prism.js" type="text/javascript"></script>
+<link rel="stylesheet" href="prism.css" />
+</head>
+<body>
+<pre><code class="language-csharp">
+
+using System;
+using System.Linq;
+using System.Timers;
+
+//https://www.arla.se/recept/kladdkaka/
+public class Kladdkaka 
+{
+	#region ingredienser
+
+	g smör = 100;
+	dl strösocker = 2.5;
+	var ägg = 2;
+	dl vetemjöl = 1;
+	msk kakao = 3;
+	tsk vaniljsocker = 1;
+
+	#endregion
+
+	ArrayList redskap = new ArrayList();
+	
+	static void Main() 
+	{
+		Setup();
+		var recept = new Kladdkaka();
+		recept.Run();
+	}
+	private static void Setup()
+	{
+		Ugn.GallerPosition = Position.Middle;
+		Ugn.Temperatur = 175;
+		Ugn.ToggleOn = true;
+		
+		redskap.Add(new Kastrull());
+		redskap.Add(new Slev());
+		
+		var ugnsform = new Ugnsform(24);
+		ugnsform.Preparera();
+		redskap.Add(ugnsform);
+	}
+	private void Run() 
+	{
+		
+		var kastrull = redskap.First(p => typeof(p) == Kastrull);
+		//Smält smöret i en kastrull
+		kastrull.Innehåll.Add(smör);
+		
+		Spisplatta.TemperaturSteg = Spisplatta.HämtaLagomTemperatur();
+		Spisplatta.Platta = kastrull;
+		while(!ÄrFlytande(smör)) 
+		{
+			Thread.Sleep(1000);
+		}
+		
+		SpisPlatta.TemperaturSteg = 0;
+		Spisplatta.Platta = null;
+		
+		kastrull.Innehåll.Add(socker);
+		kastrull.Innehåll.Add(ägg); //TODO: Knäck ägget först
+		
+		var slev = redskap.First(p => typeof(p) == Slev);
+		
+		while(kastrull.Innehåll != välblandat) 
+		{
+			Blanda(kastrull.Innehåll, slev);
+		}
+		
+		kastrull.Innehåll.Add(vetemjöl);
+		kastrull.Innehåll.Add(kakao);
+		kastrull.Innehåll.Add(vaniljsocker);
+		
+		while(kastrull.Innehåll != välblandat)
+		{
+			Blanda(kastrull.Innehåll, slev);
+		}
+		
+		var ugnsform = redskap.First(p => typeof(p) == Ugnsform);
+		ugnsform.Innehåll.AddRange(kastrull.Innehåll);
+		Ugn.Innehåll.Add(ugnsform);
+		
+		var timer = new Timer(1000*60*15);
+		timer.Elapsed += FärdigBakad;
+		
+	}
+	
+	private void FärdigBakad(Object source, ElapsedEventArgs a)
+	{
+		var kaka = Ugn.Innehåll.RemoveAt(0);
+	}
+}
+
+public static class Spisplatta
+{
+	int TemperaturSteg { get; set; }
+	Kastrull Platta { get; set; }
+	
+	public static int HämtaLagomTemperatur
+	{
+		int steg;
+		if(maxof(Spisplatta) == 12) 
+		{
+			steg = 6;
+		}
+		else 
+		{
+			steg = 4;
+		}
+		
+		return steg;
+	}
+}
+
+public class Kastrull
+{
+	ArrayList Innehåll { get; set; } = new ArrayList();
+}
+
+public class Ugnsform
+{
+	ArrayList Innehåll { get; set; } = new ArrayList();
+	cm Diameter { get; set; }
+
+	public Ugnsform(cm diameter) 
+	{
+		this.Diameter = diameter;
+	}
+	
+	public void Preparera()
+	{
+		//TODO: Smörj och bröa formen
+	}
+	
+}
+
+public static class Ugn 
+{
+	celsius Temperatur { get; set; }
+	bool ToggleOn { get; set; }
+	Position GallerPosition { get; set; }
+	ArrayList Innehåll { get; set; } = new ArrayList();
+}
+</code></pre>
+
+
+</body>
+</html>
