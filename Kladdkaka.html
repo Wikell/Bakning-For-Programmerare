@@ -12,6 +12,7 @@
 using System;
 using System.Linq;
 using System.Timers;
+using System.Baking;
 
 //https://www.arla.se/recept/kladdkaka/
 public class Kladdkaka 
@@ -19,6 +20,8 @@ public class Kladdkaka
 	#region ingredienser
 
 	g smör = 100;
+	g extraSmör = 5;
+	msk ströbröd = 3;
 	dl strösocker = 2.5;
 	var ägg = 2;
 	dl vetemjöl = 1;
@@ -70,7 +73,7 @@ public class Kladdkaka
 		
 		var slev = redskap.First(p => typeof(p) == Slev);
 		
-		while(kastrull.Innehåll != välblandat) 
+		while(kastrull.Innehåll.Blandning != Blandning.Välblandat) 
 		{
 			Blanda(kastrull.Innehåll, slev);
 		}
@@ -79,7 +82,7 @@ public class Kladdkaka
 		kastrull.Innehåll.Add(kakao);
 		kastrull.Innehåll.Add(vaniljsocker);
 		
-		while(kastrull.Innehåll != välblandat)
+		while(kastrull.Innehåll.Blandning != Blandning.Välblandat)
 		{
 			Blanda(kastrull.Innehåll, slev);
 		}
@@ -96,13 +99,14 @@ public class Kladdkaka
 	private void FärdigBakad(Object source, ElapsedEventArgs a)
 	{
 		var kaka = Ugn.Innehåll.RemoveAt(0);
+		Ugn.ToggleOn = false;
 	}
 }
 
 public static class Spisplatta
 {
-	int TemperaturSteg { get; set; }
-	Kastrull Platta { get; set; }
+	static int TemperaturSteg { get; set; }
+	static Kastrull Platta { get; set; }
 	
 	public static int HämtaLagomTemperatur
 	{
@@ -137,17 +141,30 @@ public class Ugnsform
 	
 	public void Preparera()
 	{
-		//TODO: Smörj och bröa formen
+		//Smörj och bröa formen
+		Innehåll.Add(extraSmör);
+		var surface = Innehåll.GetInnerSurface();
+		while(!surface.IsCovered(extraSmör)) 
+		{
+			surface.Cover(extraSmör);
+		}
+		
+		Innehåll.Add(ströbröd);
+		while(!surface.IsCovered(ströbröd))
+		{
+			surface.Cover(ströbröd);
+		}
+		
 	}
 	
 }
 
 public static class Ugn 
 {
-	celsius Temperatur { get; set; }
-	bool ToggleOn { get; set; }
-	Position GallerPosition { get; set; }
-	ArrayList Innehåll { get; set; } = new ArrayList();
+	static celsius Temperatur { get; set; }
+	static bool ToggleOn { get; set; }
+	static Position GallerPosition { get; set; }
+	static ArrayList Innehåll { get; set; } = new ArrayList();
 }
 </code></pre>
 
