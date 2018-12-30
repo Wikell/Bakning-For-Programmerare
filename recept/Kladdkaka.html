@@ -42,7 +42,7 @@ public class Kladdkaka
 	{
 		Ugn.GallerPosition = Position.Middle;
 		Ugn.Temperatur = 175;
-		Ugn.ToggleOn = true;
+		Ugn.ToggleOnOff();
 		
 		redskap.Add(new Kastrull());
 		redskap.Add(new Slev());
@@ -99,7 +99,7 @@ public class Kladdkaka
 	private void FärdigBakad(Object source, ElapsedEventArgs a)
 	{
 		var kaka = Ugn.Innehåll.RemoveAt(0);
-		Ugn.ToggleOn = false;
+		Ugn.ToggleOnOff();
 	}
 }
 
@@ -162,9 +162,38 @@ public class Ugnsform
 public static class Ugn 
 {
 	static celsius Temperatur { get; set; }
-	static bool ToggleOn { get; set; }
+	static bool ÄrIgång { get; set; }
 	static Position GallerPosition { get; set; }
 	static ArrayList Innehåll { get; set; } = new ArrayList();
+	static UgnsRatt Ratt { get; set; }
+	
+	static void ToggleOnOff() 
+	{
+		if(Ugn.ÄrIgång) 
+		{
+			Ugn.Ratt.Set("0");
+			Ugn.ÄrIgång = false;
+		}
+		else 
+		{
+			if(Ugn.Ratt.HarSymbol("Två linjer")) 
+			{
+				Ugn.Ratt.Set("Två linjer"); //Traditionell över/under-värme
+			}
+			else if(Ugn.Ratt.HarSymbol("Fläkt"))
+			{
+				Ugn.Ratt.Set("Fläkt"); //Varmluft
+			}
+			else
+			{
+				throw new KitchenException("Olämplig ugnstyp");
+			}
+			
+			Ugn.ÄrIgång = true;
+		}
+	}
+	
+	
 }
 </code></pre>
 
