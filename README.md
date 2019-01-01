@@ -1,7 +1,7 @@
 # Bakning För Programmerare
 
 Recept som är omskrivna till kod för att få ett tydligt och väldefinierat recept som inte utelämnar lika mycket saker som recept generellt brukar kunna göra.
-Öppna html-filen för respektive recept för att att se koden med code highlighting.
+Öppna html-filen för respektive recept i en webbläsare för att att se koden med code highlighting.
 
 ## Anda
 - Receptens enkelhet går alltid först
