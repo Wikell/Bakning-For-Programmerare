@@ -1,0 +1,176 @@
+<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="sv" xml:lang="sv">
+<head>
+<title>Kolakakor</title>
+<meta charset="UTF-8">
+<script src="..\lib\prism.js" type="text/javascript"></script>
+<link rel="stylesheet" href="..\lib\prism.css" />
+</head>
+<body>
+<pre><code class="language-csharp">
+
+using System;
+using System.Linq;
+using System.Timers;
+using System.Baking;
+
+public class Kolakaka 
+{
+	#region ingredienser
+
+	g smör = 100;
+	dl strösocker = 1;
+	msk vaniljsocker = 1;
+	msk ljusSirap = 1;
+	dl vetemjöl = 2.5;
+	tsk bakpulver = 1;
+	var bakplåtspapper = 1;
+
+	#endregion
+
+	var redskap = new List< Redskap>();
+	var timer = new Timer();
+	
+	static void Main() 
+	{
+		Setup();
+		var recept = new Kolakakor();
+		recept.Run();
+	}
+	private static void Setup()
+	{
+		Ugn.GallerPosition = Position.Middle;
+		Ugn.Temperatur = 175;
+		Ugn.ToggleOnOff();
+		
+		while(!IsRoomTemperature(smör)) 
+		{
+			Thread.Sleep(1000*60);
+		}
+		
+		redskap.Add(new Bunke());
+		redskap.Add(new Bunke());
+		redskap.Add(new Slev());
+		redskap.Add(new Sked());
+		
+		var plåt = new Plåt();
+		plåt.Add(bakplåtspapper);
+		redskap.Add(plåt);
+	}
+	private void Run() 
+	{
+		var slev = redskap.First(p => typeof(p) == Slev);
+		var bunkar = redskap.Where(p => typeof(p) == Bunke).ToList();
+		
+		bunkar[0].Add(smör);
+		bunkar[0].Add(strösocker);
+		bunkar[0].Add(slev);
+		
+		while(!BlandningPoröst(bunkar[0].Innehåll)) 
+		{
+			Blanda(bunkar[0].Innehåll);
+		}
+		
+		var sked = redskap.First(p => typeof(p) == Sked);
+		bunkar[1].Add(vetemjöl);
+		bunkar[1].Add(bakpulver);
+		bunkar[1].Add(vaniljsocker);
+		bunkar[1].Add(sked);
+		
+		while(!BlandningVäl(bunkar[1].Innehåll))
+		{
+			Blanda(bunkar[1].Innehåll);
+		}
+		
+		bunkar[1].Remove(sked);
+		
+		bunkar[0].AddRange(bunkar[1].Innehåll);
+		bunkar[0].Add(ljusSirap);
+		
+		//TODO: Arbeta ihop till en deg
+		
+		//TODO: rulla till 3 längder och platta till
+		
+		var plåt = redskap.First(p => typeof(p) == Plåt);
+		plåt.Innehåll.AddRange(bunkar[0].Innehåll);
+		Ugn.Innehåll.Add(plåt);
+		
+		var timer = new Timer(1000*60*10);
+		timer.Elapsed += FärdigBakad; //TODO: 10-12 minuter på receptet. Kolla om klar och annars starta ny timer
+		timer.Start();
+		
+	}
+	
+	private void FärdigBakad(Object source, ElapsedEventArgs a)
+	{
+		var kakor = Ugn.Innehåll.RemoveAt(0);
+		Ugn.ToggleOnOff();
+		
+		//TODO: skär kakorna på plåten
+	}
+	
+	private bool BlandningPoröst(List<Ingrediens> blandning)
+	{
+		if(blandning.GetItem("strösocker").Visibility < 0.05) 
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private bool BlandningVäl(List<Ingrediens> blandning) where T : Ingrediens
+	{
+		foreach(var ingrediens in blandning)
+		{
+			if(blandning.Concentration(ingrediens) > 0.1) //klump
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+}
+
+public static class Ugn 
+{
+	static celsius Temperatur { get; set; }
+	static bool ÄrIgång { get; set; }
+	static Position GallerPosition { get; set; }
+	static ArrayList Innehåll { get; set; } = new ArrayList();
+	static UgnsRatt Ratt { get; set; }
+	
+	static void ToggleOnOff() 
+	{
+		if(Ugn.ÄrIgång) 
+		{
+			Ugn.Ratt.Set("0");
+			Ugn.ÄrIgång = false;
+		}
+		else 
+		{
+			if(Ugn.Ratt.HarSymbol("Två linjer")) 
+			{
+				Ugn.Ratt.Set("Två linjer"); //Traditionell över/under-värme
+			}
+			else if(Ugn.Ratt.HarSymbol("Fläkt"))
+			{
+				Ugn.Ratt.Set("Fläkt"); //Varmluft
+			}
+			else
+			{
+				throw new KitchenException("Olämplig ugnstyp");
+			}
+			
+			Ugn.ÄrIgång = true;
+		}
+	}
+	
+	
+}
+</code></pre>
+
+
+</body>
+</html>
