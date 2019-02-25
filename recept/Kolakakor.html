@@ -52,6 +52,7 @@ public class Kolakaka
 		redskap.Add(new Bunke());
 		redskap.Add(new Slev());
 		redskap.Add(new Sked());
+		redskap.Add(new Bordskniv());
 		
 		var plåt = new Plåt();
 		plåt.Add(bakplåtspapper);
@@ -89,24 +90,71 @@ public class Kolakaka
 		
 		//TODO: Arbeta ihop till en deg
 		
-		//TODO: rulla till 3 längder och platta till
+		
+		var deg = bunkar[0].Innehåll.Single();
+		
+		//rulla till 3 längder och platta till
+		var degKlumpar = deg.Split(3);
 		
 		var plåt = redskap.First(p => typeof(p) == Plåt);
-		plåt.Innehåll.AddRange(bunkar[0].Innehåll);
+		cm degRulleDiameter = 3;
+		
+		foreach(var degKlump in degKlumpar)
+		{
+			while(!degKlump.IsCylindrical() && degKlump.Diameter > degRulleDiameter) 
+			{
+				degKlump.Rulla();
+			} 
+			var deglängd = degKlump.Flatten();
+			
+			plåt.Innehåll.Add(deglängd);
+		}
+		
 		Ugn.Innehåll.Add(plåt);
 		
-		var timer = new Timer(1000*60*10);
-		timer.Elapsed += FärdigBakad; //TODO: 10-12 minuter på receptet. Kolla om klar och annars starta ny timer
+		timer.Interval = 1000*60*10;
+		timer.Elapsed += KollaOmFärdigbakad;
 		timer.Start();
 		
 	}
 	
-	private void FärdigBakad(Object source, ElapsedEventArgs a)
+	private void KollaOmFärdigbakad(Object source, ElapsedEventArgs a) 
 	{
-		var kakor = Ugn.Innehåll.RemoveAt(0);
+		timer.Stop();
+		//timer.Dispose(); //tekniskt korrekt, men gör inte detta med din timer är du snäll
+		
+		//TODO: Check färdigbakad på ugn innehåll
+		if(!true) 
+		{
+			timer = new Timer(1000*60*1);
+			timer.Elapsed += KollaOmFärdigBakad;
+			timer.Start();
+		}
+		else 
+		{
+			FärdigBakad();
+		}
+	}
+	
+	private void FärdigBakad()
+	{
+		var plåt = Ugn.Innehåll.RemoveAt(0);
 		Ugn.ToggleOnOff();
 		
-		//TODO: skär kakorna på plåten
+		//Skär kakorna på plåten
+		var kniv = redskap.First(p => typeof(p) == Bordskniv);
+		var kaklängder = plåt.Innehåll;
+		for(int i=0; i < kaklängder.Count; i++)
+		{
+			cm x = 3;
+			Do 
+			{
+				kniv.Position = kaklängder[i].Start + x;
+				kniv.Dela();
+				x = x + 3;
+			} while(x < kaklängder[i].length);
+		}
+		
 	}
 	
 	private bool BlandningPoröst(List<Ingrediens> blandning)
@@ -123,7 +171,7 @@ public class Kolakaka
 	{
 		foreach(var ingrediens in blandning)
 		{
-			if(blandning.Concentration(ingrediens) > 0.1) //klump
+			if(blandning.Concentration(ingrediens) > 0.1) //klump av samma ingrediens
 			{
 				return false;
 			}
